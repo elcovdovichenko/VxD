@@ -1,0 +1,28 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CVXDFLAGS  = -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG
+AFLAGS     = -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG
+
+all: atk16.vxd
+
+atk16.obj: atk16.c
+        cl $(CVXDFLAGS) -Fo$@ %s
+
+declare.obj: declare.asm
+        ml $(AFLAGS) -Fo$@ %s
+
+atk16.vxd: atk16.obj declare.obj atk16.def
+        echo >NUL @<<atk16.crf
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE
+-DEF:atk16.def -OUT:atk16.vxd -MAP:atk16.map
+-VXD vxdwraps.clb atk16.obj declare.obj
+<<
+        link @atk16.crf
+        mapsym atk16
+
+        copy atk16.vxd c:\windows\system

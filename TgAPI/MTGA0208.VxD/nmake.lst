@@ -1,0 +1,32 @@
+	cl -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG -Fomtga0208.obj mtga0208.c
+mtga0208.c
+D:\DDK\inc32\shell.h(290) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(292) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(299) : warning C4229: anachronism used : modifiers on data are ignored
+mtga0208.c(256) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+mtga0208.c(391) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+mtga0208.c(880) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'void (__cdecl *)(void )'
+mtga0208.c(1416) : warning C4761: integral size mismatch in argument; conversion supplied
+mtga0208.c(1417) : warning C4761: integral size mismatch in argument; conversion supplied
+mtga0208.c(1445) : warning C4761: integral size mismatch in argument; conversion supplied
+	ml -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG -Fodeclare.obj declare.asm
+ Assembling: declare.asm
+	echo >NUL @mtga0208.crf
+	link @mtga0208.crf
+Microsoft (R) 32-Bit Incremental Linker Version 5.00.7022
+Copyright (C) Microsoft Corp 1992-1997. All rights reserved.
+
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE 
+-DEF:mtga0208.def -OUT:mtga0208.vxd -MAP:mtga0208.map 
+-VXD vxdwraps.clb mtga0208.obj declare.obj 
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (40000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+	mapsym mtga0208
+Microsoft (R) Symbol File Generator  Version 6.00
+Copyright (C) Microsoft Corp 1984 - 1995.  All rights reserved.
+Line number support enabled
+Program entry point at 0000:0000
+	copy mtga0208.vxd c:\windows\system
+        0 file(s) copied.

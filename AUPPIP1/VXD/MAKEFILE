@@ -1,0 +1,28 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CVXDFLAGS  = -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG
+AFLAGS     = -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG
+
+all: auppip1.vxd
+
+auppip1.obj: auppip1.c
+        cl $(CVXDFLAGS) -Fo$@ %s
+
+declare.obj: declare.asm
+        ml $(AFLAGS) -Fo$@ %s
+
+auppip1.vxd: auppip1.obj declare.obj auppip1.def
+        echo >NUL @<<auppip1.crf
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE
+-DEF:auppip1.def -OUT:auppip1.vxd -MAP:auppip1.map
+-VXD vxdwraps.clb auppip1.obj declare.obj
+<<
+        link @auppip1.crf
+        mapsym auppip1
+
+        copy auppip1.vxd c:\windows\system

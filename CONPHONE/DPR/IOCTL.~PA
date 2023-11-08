@@ -1,0 +1,136 @@
+unit IOCTL;
+
+interface
+
+uses
+  Windows, SysUtils;
+
+const
+   Cycles = 2;
+   Points = 8;
+
+type
+   TBuf = String[127];
+
+const
+   fVxDIsLoaded : Boolean = FALSE;
+   hIRQ : DWORD = 0;
+   sIRQ : Byte = 0;
+
+function LoadVxD : Boolean;
+function CloseVxD : Boolean;
+function HookController(hWindow : HWnd; hMessage : Word; nIRQ : Byte; addrINT : Word) : Boolean;
+function TransmitINT(Key : Byte; Command : TBuf) : Byte;
+function ReceiveINT(Key : Byte) : TBuf;
+function StateINT(Key : Byte) : Byte;
+
+implementation
+
+const
+   CVXD_APIFUNC_1 = 1;
+   CVXD_APIFUNC_2 = 2;
+
+type
+   TState =  Array[0..Cycles-1]Of Byte;
+
+var
+   hCVxD : THandle;
+   cbBytesReturned : DWord;
+   RetInfo : Array[0..9]Of DWord;
+   PutInfo : Array[0..9]Of DWord;
+   pReceive, pTransmit : Array[0..Cycles-1]Of ^TBuf;
+   pINT : ^TState;
+
+
+function LoadVxD : Boolean;
+begin
+   Result:=False;
+   fVxDIsLoaded:=False;
+   hIRQ:=0;
+
+   hCVxD:=CreateFile('\\.\CONTAPP2.VXD', 0, 0, NIL,
+                     CREATE_NEW, FILE_FLAG_DELETE_ON_CLOSE, 0);
+   if hCVxD = INVALID_HANDLE_VALUE
+   then Exit;
+
+   fVxDIsLoaded:=True;
+   Result:=True;
+end;
+
+function CloseVxD : Boolean;
+begin
+
+  Result:=False;
+
+  if not fVxDIsLoaded
+  then Exit;
+
+  CloseHandle(hCVxD);
+
+  fVxDIsLoaded:=False; hIRQ:=0;
+  Result:=True;
+
+end;
+
+function HookController(hWindow : HWnd; hMessage : Word; nIRQ : Byte; addrINT : Word) : Boolean;
+begin
+
+  Result:=False;
+
+  if not fVxDIsLoaded
+  then Exit;
+
+  PutInfo[0]:=nIRQ;
+  PutInfo[1]:=addrINT;
+  PutInfo[2]:=hWindow;
+  PutInfo[3]:=hMessage;
+
+  if DeviceIOControl(hCVxD, CVXD_APIFUNC_1, @PutInfo, sizeof(PutInfo),
+                         @RetInfo, sizeof(RetInfo), cbBytesReturned, NIL)
+  then begin
+       hIRQ:=RetInfo[0];
+       if hIRQ = 0 then Exit;
+       sIRQ:=RetInfo[1];
+       pReceive[0]:=Pointer(RetInfo[2]);
+       pTransmit[0]:=Pointer(RetInfo[3]);
+       pReceive[1]:=Pointer(RetInfo[4]);
+       pTransmit[1]:=Pointer(RetInfo[5]);
+       pINT:=Pointer(RetInfo[6]);
+       Result:=True;
+       end;
+end;
+
+function TransmitINT(Key : Byte; Command : TBuf) : Byte;
+var Cycle : Byte;
+begin
+
+  Result:=0;
+
+  if not fVxDIsLoaded
+  then Exit;
+
+  Cycle:=Key div Points;
+  pTransmit[Cycle]^:=Command;
+  PutInfo[0]:=Key;
+  if DeviceIOControl(hCVxD, CVXD_APIFUNC_2, @PutInfo, sizeof(PutInfo),
+                           @RetInfo, sizeof(RetInfo), cbBytesReturned, NIL)
+  then Result:=pINT^[Cycle];
+end;
+
+
+function ReceiveINT(Key : Byte) : TBuf;
+begin
+  Result:='';
+
+  if not fVxDIsLoaded
+  then Exit;
+
+  Result:=pReceive[Key div Points]^;
+end;
+
+function StateINT(Key : Byte) : Byte;
+begin
+  Result:=pINT^[Key div Points];
+end;
+
+end.

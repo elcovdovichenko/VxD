@@ -1,0 +1,28 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CVXDFLAGS  = -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG
+AFLAGS     = -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG
+
+all: tgsingle.vxd
+
+tgsingle.obj: tgsingle.c
+        cl $(CVXDFLAGS) -Fo$@ %s
+
+declare.obj: declare.asm
+        ml $(AFLAGS) -Fo$@ %s
+
+tgsingle.vxd: tgsingle.obj declare.obj tgsingle.def
+        echo >NUL @<<tgsingle.crf
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE
+-DEF:tgsingle.def -OUT:tgsingle.vxd -MAP:tgsingle.map
+-VXD vxdwraps.clb tgsingle.obj declare.obj
+<<
+        link @tgsingle.crf
+        mapsym tgsingle
+
+        copy tgsingle.vxd c:\windows\system

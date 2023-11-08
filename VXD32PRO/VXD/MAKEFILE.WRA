@@ -1,0 +1,35 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=bin
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CVXDFLAGS  = -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG
+AFLAGS     = -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG
+
+all: direxist ..\bin\cvxdsamp.vxd
+
+direxist:
+        if not exist ..\bin\nul    md ..\bin
+
+..\bin\cvxdsamp.obj: cvxdsamp.c
+        cl $(CVXDFLAGS) -Fo$@ %s
+
+..\bin\cvxdctrl.obj: cvxdctrl.asm
+        ml $(AFLAGS) -Fo$@ %s
+
+..\bin\wrappers.obj: wrappers.asm
+        ml -coff -DBLD_COFF -W2 -c -Cx -DMASM6 -DSEGNUM=1 -Fo$@ %s
+
+..\bin\cvxdsamp.vxd: ..\bin\cvxdsamp.obj ..\bin\cvxdctrl.obj ..\bin\wrappers.obj cvxdsamp.def
+        echo >NUL @<<cvxdsamp.crf
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE 
+-DEF:cvxdsamp.def -OUT:..\bin\cvxdsamp.vxd -MAP:..\bin\cvxdsamp.map
+-VXD vxdwraps.clb ..\bin\cvxdsamp.obj ..\bin\cvxdctrl.obj ..\bin\wrappers.obj
+<<
+        link @cvxdsamp.crf
+        cd ..\bin
+        mapsym cvxdsamp
+
+        copy ..\bin\cvxdsamp.vxd c:\windows\system

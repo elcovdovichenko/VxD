@@ -1,0 +1,28 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CVXDFLAGS  = -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG
+AFLAGS     = -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG
+
+all: mtga0208.vxd
+
+mtga0208.obj: mtga0208.c
+        cl $(CVXDFLAGS) -Fo$@ %s
+
+declare.obj: declare.asm
+        ml $(AFLAGS) -Fo$@ %s
+
+mtga0208.vxd: mtga0208.obj declare.obj mtga0208.def
+        echo >NUL @<<mtga0208.crf
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE
+-DEF:mtga0208.def -OUT:mtga0208.vxd -MAP:mtga0208.map
+-VXD vxdwraps.clb mtga0208.obj declare.obj
+<<
+        link @mtga0208.crf
+        mapsym mtga0208
+
+        copy mtga0208.vxd c:\windows\system

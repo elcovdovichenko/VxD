@@ -1,0 +1,29 @@
+	cl -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG -Fotgsingle.obj tgsingle.c
+tgsingle.c
+D:\DDK\inc32\shell.h(290) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(292) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(299) : warning C4229: anachronism used : modifiers on data are ignored
+tgsingle.c(240) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+tgsingle.c(375) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+tgsingle.c(852) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'void (__cdecl *)(void )'
+	ml -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG -Fodeclare.obj declare.asm
+ Assembling: declare.asm
+	echo >NUL @tgsingle.crf
+	link @tgsingle.crf
+Microsoft (R) 32-Bit Incremental Linker Version 5.00.7022
+Copyright (C) Microsoft Corp 1992-1997. All rights reserved.
+
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE 
+-DEF:tgsingle.def -OUT:tgsingle.vxd -MAP:tgsingle.map 
+-VXD vxdwraps.clb tgsingle.obj declare.obj 
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (40000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+	mapsym tgsingle
+Microsoft (R) Symbol File Generator  Version 6.00
+Copyright (C) Microsoft Corp 1984 - 1995.  All rights reserved.
+Line number support enabled
+Program entry point at 0000:0000
+	copy tgsingle.vxd c:\windows\system
+        0 file(s) copied.

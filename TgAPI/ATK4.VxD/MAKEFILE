@@ -1,0 +1,28 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CVXDFLAGS  = -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG
+AFLAGS     = -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG
+
+all: atk4.vxd
+
+atk4.obj: atk4.c
+        cl $(CVXDFLAGS) -Fo$@ %s
+
+declare.obj: declare.asm
+        ml $(AFLAGS) -Fo$@ %s
+
+atk4.vxd: atk4.obj declare.obj atk4.def
+        echo >NUL @<<atk4.crf
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE
+-DEF:atk4.def -OUT:atk4.vxd -MAP:atk4.map
+-VXD vxdwraps.clb atk4.obj declare.obj
+<<
+        link @atk4.crf
+        mapsym atk4
+
+        copy atk4.vxd c:\windows\system

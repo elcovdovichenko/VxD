@@ -1,0 +1,167 @@
+unit Main;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Classes, Graphics, Controls,
+  Forms, Dialogs, StdCtrls, ExtCtrls, Protocol, IOCTL,DatPhone;
+
+Const
+     WM_StateChanged:Word = WM_User;
+     WM_SaveTalk:Word     = WM_User;
+     WM_ServiceKvit:Word  = WM_User;
+     WM_CashCheck:Word    = WM_User;
+
+type
+  TForm1 = class(TForm)
+    Memo: TMemo;
+    OpenButton: TButton;
+    CloseButton: TButton;
+    Label1: TLabel;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure OpenButtonClick(Sender: TObject);
+    procedure CloseButtonClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+  private
+    { Private declarations }
+    procedure VxdProc (var Mess : TMessage) ; message wm_VxD;
+    procedure WndProc (var Msg:TMessage); Override;
+    procedure AppMessage(var Msg: TMsg; var Handled: Boolean);
+
+  public
+    { Public declarations }
+  Published
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.DFM}
+
+const
+   CurrentKey : Byte = 8;
+   NumberIRQ  : Byte = 5;
+   BaseAddr   : Word = $260;
+
+
+function ProtocolStr(T:TBuf):String;
+var S:String;
+    I:Integer;
+begin
+  S:=IntToHex(Length(T),2)+'->';
+  for I:=1 to Length(T) do S:=S+IntToHex(Byte(T[i]),2);
+  ProtocolStr:=S;
+end;
+
+procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+   ControlPhoneDone;
+   CloseVxD;
+end;
+
+procedure TForm1.VxdProc (var Mess : TMessage);
+var Key:DWord;
+begin
+Key:=Mess.WParam;
+ControlMessageHandle(Key);
+end;
+
+procedure TForm1.OpenButtonClick(Sender: TObject);
+begin
+
+  if not fVxDIsLoaded
+  then begin
+       Memo.Lines.Add('VxD is not loaded');
+       Exit;
+       end;
+
+   if hIRQ = 0
+   then begin
+        Memo.Lines.Add('IRQ is not available');
+        Exit;
+        end;
+
+   PhoneOpen(CurrentKey,10);
+end;
+
+procedure TForm1.CloseButtonClick(Sender: TObject);
+begin
+
+  if not fVxDIsLoaded
+  then begin
+       Memo.Lines.Add('VxD is not loaded');
+       Exit;
+       end;
+
+   if hIRQ = 0
+   then begin
+        Memo.Lines.Add('IRQ is not available');
+        Exit;
+        end;
+
+   PhoneClose(CurrentKey);
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+var dwErrorCode : DWord;
+begin
+   if LoadVxD
+   then begin
+        Memo.Lines.Add('VxD is ready');
+
+        ControlWindowRegister(Handle,'TariffP.DLL');
+        ControlPhoneInit(2,NumberIRQ,BaseAddr);
+        if hIRQ = 0
+        then Memo.Lines.Add('IRQ is not available')
+        else begin
+             ControlPhoneRegister(CurrentKey);
+             Memo.Lines.Add('IRQ Handle: '+IntToHex(hIRQ,8));
+             Memo.Lines.Add('IRQ State: '+IntToHex(sIRQ,2));
+             end;
+
+        end
+   else begin
+        dwErrorCode:=GetLastError;
+        if dwErrorCode = ERROR_NOT_SUPPORTED
+        then Memo.Lines.Add('Device does not support IOCTL')
+        else Memo.Lines.Add('Unable to open Vxd,Error code: '+IntToStr(dwErrorCode));
+        end;
+
+  WM_StateChanged:=RegisterWindowMessage('WM_STATECHANGED');
+  WM_SaveTalk:=RegisterWindowMessage('WM_SAVETALK');
+  WM_ServiceKvit:=RegisterWindowMessage('WM_SERVICEKVIT');
+  WM_CashCheck:=RegisterWindowMessage('WM_CASHCHECK');
+
+  ControlMessageRegister(WM_StateChanged,WM_SaveTalk,WM_ServiceKvit,WM_CashCheck);
+  Application.OnMessage:=AppMessage;
+end;
+
+
+Procedure TForm1.AppMessage;
+Var State:TPhoneStateRec;
+Begin
+  if Msg.message = WM_StateChanged then
+  begin
+    Caption:=IntToStr(Msg.WParam);
+    State:=GetPhoneState(Msg.WParam);
+    Label1.Caption:=State.Talk.FDialNumber;
+    Handled := True;
+  end;
+End;
+
+Procedure TForm1.WndProc;
+Var State:TPhoneStateRec;
+Begin
+  If Msg.Msg = WM_StateChanged
+  Then  Begin
+        Caption:=IntToStr(Msg.WParam);
+        State:=GetPhoneState(Msg.WParam);
+        Label1.Caption:=State.Talk.FDialNumber;
+        End
+  Else Inherited WndProc(Msg);
+
+End;
+
+end.

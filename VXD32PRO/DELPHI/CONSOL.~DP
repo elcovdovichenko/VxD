@@ -1,0 +1,14 @@
+program Consol;
+
+uses
+  Forms,
+  Main in 'Main.pas' {Form1},
+  Windows in 'C:\Program Files\Borland\Delphi 3\Source\RTL\WIN\windows.pas';
+
+{$R *.RES}
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

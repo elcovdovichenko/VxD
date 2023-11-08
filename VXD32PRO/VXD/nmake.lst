@@ -1,0 +1,32 @@
+	if not exist ..\bin\nul    md ..\bin
+	cl -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG -Fo..\bin\cvxdsamp.obj cvxdsamp.c
+cvxdsamp.c
+D:\DDK\inc32\shell.h(290) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(292) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(299) : warning C4229: anachronism used : modifiers on data are ignored
+cvxdsamp.c(138) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+cvxdsamp.c(139) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+cvxdsamp.c(308) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'void (__cdecl *)(void )'
+	ml -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG -Fo..\bin\cvxdctrl.obj cvxdctrl.asm
+ Assembling: cvxdctrl.asm
+	echo >NUL @cvxdsamp.crf
+	link @cvxdsamp.crf
+Microsoft (R) 32-Bit Incremental Linker Version 5.00.7022
+Copyright (C) Microsoft Corp 1992-1997. All rights reserved.
+
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE 
+-DEF:cvxdsamp.def -OUT:..\bin\cvxdsamp.vxd -MAP:..\bin\cvxdsamp.map 
+-VXD vxdwraps.clb ..\bin\cvxdsamp.obj ..\bin\cvxdctrl.obj 
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (40000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "ICODE_vxdd" sections found with different attributes (C0000040)
+	cd ..\bin
+	mapsym cvxdsamp
+Microsoft (R) Symbol File Generator  Version 6.00
+Copyright (C) Microsoft Corp 1984 - 1995.  All rights reserved.
+Line number support enabled
+Program entry point at 0000:0000
+	copy ..\bin\cvxdsamp.vxd c:\windows\system
+        1 file(s) copied

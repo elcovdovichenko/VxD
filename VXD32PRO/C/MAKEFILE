@@ -1,0 +1,26 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=bin
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CFLAGS     = -DWIN32 -DCON -Di386 -D_X86_ -D_NTWIN -W3 -Gs -D_DEBUG -Zi
+LFLAGS     = -machine:i386 -debug:notmapped,full -debugtype:cv -subsystem:console kernel32.lib 
+
+all: direxist ..\bin\consol.exe
+
+direxist:
+        if not exist ..\bin\nul    md ..\bin
+
+..\bin\consol.obj: consol.c 
+        cl $(CFLAGS) -c -Fo$@ %s
+
+..\bin\consol.exe: ..\bin\consol.obj
+        echo >NUL @<<consol.crf
+$(LFLAGS)
+-PDB:NONE -OUT:..\bin\consol.exe -MAP:..\bin\consol.map ..\bin\consol.obj 
+<<
+        link @consol.crf
+        del *.pdb
+        

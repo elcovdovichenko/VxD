@@ -1,0 +1,32 @@
+	cl -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG -Foatk16.obj atk16.c
+atk16.c
+D:\DDK\inc32\shell.h(290) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(292) : warning C4229: anachronism used : modifiers on data are ignored
+D:\DDK\inc32\shell.h(299) : warning C4229: anachronism used : modifiers on data are ignored
+atk16.c(276) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+atk16.c(411) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'unsigned char *'
+atk16.c(887) : warning C4047: '=' : 'unsigned long ' differs in levels of indirection from 'void (__cdecl *)(void )'
+atk16.c(1469) : warning C4761: integral size mismatch in argument; conversion supplied
+atk16.c(1470) : warning C4761: integral size mismatch in argument; conversion supplied
+atk16.c(1498) : warning C4761: integral size mismatch in argument; conversion supplied
+	ml -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG -Fodeclare.obj declare.asm
+ Assembling: declare.asm
+	echo >NUL @atk16.crf
+	link @atk16.crf
+Microsoft (R) 32-Bit Incremental Linker Version 5.00.7022
+Copyright (C) Microsoft Corp 1992-1997. All rights reserved.
+
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE 
+-DEF:atk16.def -OUT:atk16.vxd -MAP:atk16.map 
+-VXD vxdwraps.clb atk16.obj declare.obj 
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (40000040)
+LINK : warning LNK4078: multiple "LCODE_vxdpn" sections found with different attributes (C0000040)
+	mapsym atk16
+Microsoft (R) Symbol File Generator  Version 6.00
+Copyright (C) Microsoft Corp 1984 - 1995.  All rights reserved.
+Line number support enabled
+Program entry point at 0000:0000
+	copy atk16.vxd c:\windows\system
+        0 file(s) copied.

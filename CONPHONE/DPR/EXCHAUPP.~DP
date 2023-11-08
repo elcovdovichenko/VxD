@@ -1,0 +1,35 @@
+program ExchAupp;
+
+uses
+  Windows,Messages,Forms,
+  Main in 'Main.pas' {Form1},
+  IOCTL in 'IOCTL.pas',
+  Protocol in 'Protocol.pas';
+
+{$R *.RES}
+
+Function WindowProc(Window:HWnd; AMessage,WParam,LParam:LongInt):LongInt; StdCall; Export;
+Begin
+  WindowProc:=0;
+  Case AMessage of
+    wm_Destroy:Begin
+               PostQuitMessage(0);
+               Exit;
+               End;
+  end;
+
+  If AMessage=wm_StateChanged
+  Then Begin
+//       ShowMessage('AAAAA');
+       Exit;
+       End;
+
+  WindowProc:=DefWindowProc(Window,AMessage,WParam,LParam);
+End;
+
+
+begin
+  Application.Initialize;
+  Application.CreateForm(TForm1, Form1);
+  Application.Run;
+end.

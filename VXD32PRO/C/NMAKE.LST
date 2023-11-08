@@ -1,0 +1,11 @@
+	if not exist ..\bin\nul    md ..\bin
+	cl -DWIN32 -DCON -Di386 -D_X86_ -D_NTWIN -W3 -Gs -D_DEBUG -Zi -c -Fo..\bin\consol.obj consol.c
+consol.c
+	echo >NUL @consol.crf
+	link @consol.crf
+Microsoft (R) 32-Bit Incremental Linker Version 5.00.7022
+Copyright (C) Microsoft Corp 1992-1997. All rights reserved.
+
+-machine:i386 -debug:notmapped,full -debugtype:cv -subsystem:console kernel32.lib 
+-PDB:NONE -OUT:..\bin\consol.exe -MAP:..\bin\consol.map ..\bin\consol.obj 
+	del *.pdb

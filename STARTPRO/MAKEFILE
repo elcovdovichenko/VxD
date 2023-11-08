@@ -1,0 +1,28 @@
+
+!ifdef MASTER_MAKE
+BUILD_BITS=32
+BUILD_TYPE=
+!INCLUDE $(DDKROOT)\master.mk
+!endif
+
+CVXDFLAGS  = -Zdp -Gs -c -DIS_32 -Zl -DDEBLEVEL=1 -DDEBUG
+AFLAGS     = -coff -DBLD_COFF -DIS_32 -W2 -Zd -c -Cx -DMASM6 -DDEBLEVEL=1 -DDEBUG
+
+all: conphone.vxd
+
+conphone.obj: conphone.c
+        cl $(CVXDFLAGS) -Fo$@ %s
+
+declare.obj: declare.asm
+        ml $(AFLAGS) -Fo$@ %s
+
+conphone.vxd: conphone.obj declare.obj conphone.def
+        echo >NUL @<<conphone.crf
+-MACHINE:i386 -DEBUG:NONE -PDB:NONE
+-DEF:conphone.def -OUT:conphone.vxd -MAP:conphone.map
+-VXD vxdwraps.clb conphone.obj declare.obj
+<<
+        link @conphone.crf
+        mapsym conphone
+
+        copy conphone.vxd c:\windows\system
